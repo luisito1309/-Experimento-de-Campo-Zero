@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANTIGRAVITY: Experimento de Campo Zero - Simulación PhET</title>
+  <!-- Google Fonts: Outfit for modern scientific look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="sim-container">
+    <!-- Header -->
+    <header class="sim-header">
+      <h1>ANTIGRAVITY: Experimento de Campo Zero</h1>
+    </header>
+
+    <!-- Main Simulator Area -->
+    <main class="sim-main">
+      <div class="simulation-view">
+        <!-- Canvas for Physics Render -->
+        <canvas id="physics-canvas" width="800" height="500"></canvas>
+
+        <!-- Floating Panel Top-Left: Campo Zero Status -->
+        <div id="floating-status-panel" class="floating-panel top-left">
+          <div class="panel-header">
+            <h3>Campo Zero Antigravitatorio</h3>
+            <button id="btn-collapse-status" class="panel-collapse-btn" title="Minimizar / Expandir panel">—</button>
+          </div>
+          <div id="status-panel-content" class="panel-content">
+            <div class="bar-container">
+              <span class="bar-label">Potencia de Campo</span>
+              <div class="bar-wrapper">
+                <div id="bar-potencia" class="bar blue-bar" style="width: 0%"></div>
+                <span id="label-potencia" class="bar-value">0%</span>
+              </div>
+            </div>
+            <div class="bar-container">
+              <span class="bar-label">Estabilidad</span>
+              <div class="bar-wrapper">
+                <div id="bar-estabilidad" class="bar cyan-bar" style="width: 100%"></div>
+                <span id="label-estabilidad" class="bar-value">100%</span>
+              </div>
+            </div>
+            <div class="bar-container">
+              <span class="bar-label">Consumo Energético</span>
+              <div class="bar-wrapper">
+                <div id="bar-consumo" class="bar red-bar" style="width: 0%"></div>
+                <span id="label-consumo" class="bar-value">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Panel Bottom-Right: Digital LED Screen -->
+        <div id="floating-led-panel" class="floating-panel bottom-right digital-led">
+          <div class="led-label">INDICADOR DE DETECCIÓN</div>
+          <div id="led-text" class="led-value">Aceleración Local: -0.01g (ANTIGRAVITY)</div>
+        </div>
+      </div>
+
+      <!-- Right Control Panel -->
+      <aside class="control-panel">
+        <!-- Section 1: Controles de Campo -->
+        <section class="control-section">
+          <h2>Controles de Campo</h2>
+          <div class="control-group-row">
+            <label class="checkbox-container">
+              <input type="checkbox" id="chk-visualizacion" checked>
+              <span class="checkmark"></span>
+              Visualización de Campo
+            </label>
+          </div>
+          <div class="control-group-row">
+            <label class="checkbox-container">
+              <input type="checkbox" id="chk-autoestabilidad" checked>
+              <span class="checkmark"></span>
+              Estabilidad Automática
+            </label>
+          </div>
+        </section>
+
+        <!-- Section 2: Sliders -->
+        <section class="control-section">
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slide-fuerza">Fuerza de Campo (N)</label>
+              <span id="val-fuerza" class="slider-value">0 N</span>
+            </div>
+            <input type="range" id="slide-fuerza" min="0" max="1000" value="350" step="5">
+            <div class="slider-labels">
+              <span>0 N</span>
+              <span>500 N</span>
+              <span>1000 N</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slide-frecuencia">Frecuencia Acústica (Hz)</label>
+              <span id="val-frecuencia" class="slider-value">1000 Hz</span>
+            </div>
+            <input type="range" id="slide-frecuencia" min="1000" max="5000" value="2500" step="10">
+            <div class="slider-labels">
+              <span>1000 Hz</span>
+              <span>3000 Hz</span>
+              <span>5000 Hz</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slide-vector">Vector de Fuerza (G)</label>
+            </div>
+            <input type="range" id="slide-vector" min="1" max="10" value="5" step="1">
+            <div class="slider-labels">
+              <span>Poca</span>
+              <span>Medio</span>
+              <span>Grande</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="slider-header">
+              <label for="slide-masa">Configuración de Masa (kg)</label>
+              <span id="val-masa" class="slider-value">5.0 kg</span>
+            </div>
+            <input type="range" id="slide-masa" min="5" max="100" value="5" step="0.5">
+            <div class="slider-labels">
+              <span>5.0 kg</span>
+              <span>52.5 kg</span>
+              <span>100.0 kg</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Configuraciones de Muestra -->
+        <section class="control-section">
+          <h2>Muestra de Prueba</h2>
+          <div class="sample-selectors">
+            <button id="btn-sample-ceramic" class="sample-btn active" data-sample="ceramic">
+              <span class="sample-icon ceramic-icon"></span>
+              Bloque Cerámico
+            </button>
+            <button id="btn-sample-metal" class="sample-btn" data-sample="metal">
+              <span class="sample-icon metal-icon"></span>
+              Esfera Metálica
+            </button>
+            <button id="btn-sample-plasma" class="sample-btn" data-sample="plasma">
+              <span class="sample-icon plasma-icon"></span>
+              Plasma Encapsulado
+            </button>
+          </div>
+        </section>
+
+        <!-- Reset Button -->
+        <div class="reset-container">
+          <button id="btn-reset">Resetear Campo</button>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer Controls & Tabs (PhET Style) -->
+    <footer class="sim-footer">
+      <div class="footer-left">
+        <!-- Playback controls -->
+        <div class="playback-controls">
+          <button id="btn-play-pause" class="playback-btn pause-mode" title="Pausar/Reanudar"></button>
+          <div class="speed-toggle">
+            <button id="btn-speed-normal" class="speed-btn active">Normal</button>
+            <button id="btn-speed-slow" class="speed-btn">Lento</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="footer-center">
+        <nav class="phet-tabs">
+          <button class="tab-btn active" data-tab="intro">
+            <span class="tab-icon icon-intro"></span>
+            Intro
+          </button>
+          <button class="tab-btn" data-tab="medidas">
+            <span class="tab-icon icon-medidas"></span>
+            Medidas
+          </button>
+          <button class="tab-btn" data-tab="graficas">
+            <span class="tab-icon icon-graficas"></span>
+            Gráficas
+          </button>
+          <button class="tab-btn" data-tab="playground">
+            <span class="tab-icon icon-play"></span>
+            Patio de Juego
+          </button>
+        </nav>
+      </div>
+
+      <!-- Footer Right Spacer -->
+      <div class="footer-right">
+      </div>
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
